@@ -76,6 +76,8 @@ function connect() {
     status.textContent = 'Realtime connected';
     status.className = 'status online';
     setError('');
+    // Refetch the authoritative snapshot on every (re)connect; the socket may have missed updates while offline.
+    loadSnapshot().catch((error) => setError(error.message));
   });
 
   socket.addEventListener('message', (event) => {

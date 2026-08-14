@@ -29,6 +29,7 @@ class TelemetryService:
 
     async def ingest(self, event: TelemetryInput) -> IngestResult:
         received_at = self._now().astimezone(timezone.utc).isoformat()
-        state = self._repository.preview_state(event, received_at)
-        await self._publisher.publish(state)
-        return self._repository.ingest(event, received_at)
+        result = self._repository.ingest(event, received_at)
+        if result.current_changed and result.state is not None:
+            await self._publisher.publish(result.state)
+        return result
